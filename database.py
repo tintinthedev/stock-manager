@@ -3,6 +3,7 @@ from pymongo.collection import Collection
 from bson.objectid import ObjectId
 import bson.binary
 from typing import TypedDict
+import datetime
 
 
 class Item(TypedDict):
@@ -17,7 +18,7 @@ class Client(TypedDict):
     total_installments: int
     individual_installment_value: float
     next_installment_payment_date: float
-    installments_left_to_pay: int
+    installments_left_to_pay_date: list[str]
     paid_installments_date: list[str]
 
 
@@ -42,6 +43,34 @@ class Database:
         next_installment_payment_date: str,
     ):
 
+        next_installment_payment_date_values = next_installment_payment_date.split("/")
+        next_installment_payment_day = int(next_installment_payment_date_values[0])
+        next_installment_payment_month = int(next_installment_payment_date_values[1])
+        next_installment_payment_year = int(next_installment_payment_date_values[2])
+
+        next_installment_payment_date_as_date = datetime.date(
+            next_installment_payment_year,
+            next_installment_payment_month,
+            next_installment_payment_day,
+        )
+
+        installments_left_to_pay = []
+
+        installments_left_to_pay.append(next_installment_payment_date)
+
+        for i in range(1, total_installments):
+            next_installment_date = (
+                next_installment_payment_date_as_date + datetime.timedelta(days=30 * i)
+            )
+
+            next_installment_day = next_installment_date.day
+            next_installment_month = next_installment_date.month
+            next_installment_year = next_installment_date.year
+
+            next_installment_date = f"{next_installment_day}/{next_installment_month}/{next_installment_year}"
+
+            installments_left_to_pay.append(next_installment_date)
+
         self.clients_database.insert_one(
             {
                 "name": name,
@@ -50,7 +79,7 @@ class Database:
                 "individual_installment_value": individual_installment_value,
                 "next_installment_payment_date": next_installment_payment_date,
                 "paid_installments_date": [],
-                "installments_left_to_pay": total_installments,
+                "installments_left_to_pay": installments_left_to_pay,
             }
         )
 
