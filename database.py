@@ -19,7 +19,7 @@ class Client(TypedDict):
     individual_installment_value: float
     next_installment_payment_date: float
     installments_left_to_pay_date: list[str]
-    paid_installments_date: list[str]
+    paid_installments_dates: list[str]
 
 
 class Database:
@@ -79,9 +79,12 @@ class Database:
                 "individual_installment_value": individual_installment_value,
                 "next_installment_payment_date": next_installment_payment_date,
                 "paid_installments_date": [],
-                "installments_left_to_pay": installments_left_to_pay,
+                "installments_left_to_pay_dates": installments_left_to_pay,
             }
         )
+
+    def get_clients(self):
+        return self.clients_database.find()
 
     def create_item(self, name: str, quantity: int, image_path: str):
         with open(image_path, "rb") as item_image_file:
