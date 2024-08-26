@@ -1,10 +1,13 @@
 import customtkinter as ctk
 from tkinter import ttk
+from add_client_to_spreadsheet_window import AddClientToSpreadsheetWindow
 
 
 class ClientsSpreadsheetWindow(ctk.CTkToplevel):
     def __init__(self):
         super().__init__()
+
+        self.title("Planilha de clientes")
 
         self.attributes("-topmost", True)
 
@@ -23,16 +26,10 @@ class ClientsSpreadsheetWindow(ctk.CTkToplevel):
 
         self.create_table()
 
-        # Add/Edit client info form
-        self.client_name_entry = ctk.CTkEntry(self, placeholder_text="Client Name")
-        self.client_name_entry.pack(pady=5, padx=20, fill="x")
-
-        self.client_debt_entry = ctk.CTkEntry(self, placeholder_text="Client Debt")
-        self.client_debt_entry.pack(pady=5, padx=20, fill="x")
-
         self.add_client_button = ctk.CTkButton(
-            self, text="Add Client", command=self.add_client
+            self, text="Adicionar cliente", command=self.add_client
         )
+
         self.add_client_button.pack(pady=10, padx=20)
 
     def create_table(self):
@@ -55,8 +52,16 @@ class ClientsSpreadsheetWindow(ctk.CTkToplevel):
             self.table.column(col, width=150)
 
     def add_client(self):
-        # Add client info to the table
-        name = self.client_name_entry.get()
-        debt = self.client_debt_entry.get()
-        # Dummy data for illustration; you would use actual data
-        self.table.insert("", "end", values=(name, debt, "0", "0", "None", "None"))
+        client_creation_window = AddClientToSpreadsheetWindow()
+        self.wait_window(client_creation_window)
+
+        self.refresh_table()
+
+    def refresh_table(self):
+        # TODO: This should get clients information from the database and display on the table
+        # TODO: Clear the treeview (table) before everything
+        print("TABLE REFRESH")
+
+        # name = self.client_name_entry.get()
+        # debt = self.client_debt_entry.get()
+        # self.table.insert("", "end", values=(name, debt, "0", "0", "None", "None"))
