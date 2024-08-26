@@ -1,12 +1,14 @@
 import customtkinter as ctk
 from tkinter import ttk
 from add_client_to_spreadsheet_window import AddClientToSpreadsheetWindow
+from database import Database
 
 
 class ClientsSpreadsheetWindow(ctk.CTkToplevel):
     def __init__(self):
         super().__init__()
-
+        style = ttk.Style(self)
+        style.configure("Treeview", rowheight=200)
         self.title("Planilha de clientes")
 
         self.attributes("-topmost", True)
@@ -14,11 +16,19 @@ class ClientsSpreadsheetWindow(ctk.CTkToplevel):
         self.create_widgets()
 
     def create_widgets(self):
-        self.search_entry = ctk.CTkEntry(self, placeholder_text="Search by client name")
+        self.search_entry = ctk.CTkEntry(
+            self, placeholder_text="Procurar cliente pelo nome"
+        )
         self.search_entry.pack(pady=10, padx=20, fill="x")
 
-        self.search_button = ctk.CTkButton(self, text="Search")
+        self.search_button = ctk.CTkButton(self, text="Procurar por nome")
         self.search_button.pack(pady=5, padx=20)
+
+        self.add_client_button = ctk.CTkButton(
+            self, text="Adicionar cliente", command=self.add_client
+        )
+
+        self.add_client_button.pack(pady=10, padx=20)
 
         # Table Frame
         self.table_frame = ctk.CTkFrame(self)
@@ -26,11 +36,7 @@ class ClientsSpreadsheetWindow(ctk.CTkToplevel):
 
         self.create_table()
 
-        self.add_client_button = ctk.CTkButton(
-            self, text="Adicionar cliente", command=self.add_client
-        )
-
-        self.add_client_button.pack(pady=10, padx=20)
+        self.refresh_table()
 
     def create_table(self):
         self.table = ttk.Treeview(
@@ -58,10 +64,32 @@ class ClientsSpreadsheetWindow(ctk.CTkToplevel):
         self.refresh_table()
 
     def refresh_table(self):
-        # TODO: This should get clients information from the database and display on the table
-        # TODO: Clear the treeview (table) before everything
-        print("TABLE REFRESH")
+        # clearing the table before getting data
+        self.table.delete(*self.table.get_children())
 
-        # name = self.client_name_entry.get()
-        # debt = self.client_debt_entry.get()
-        # self.table.insert("", "end", values=(name, debt, "0", "0", "None", "None"))
+        clients = Database().get_clients()
+
+        for client in clients:
+            client_name = client["name"]
+            client_debt = client["debt"]
+            total_client_installments = client["total_installments"]
+            paid_client_installments = client["paid_installments_date"]
+            client_installments_left_to_pay = client["installments_left_to_pay_dates"]
+            next_client_installment_payment_date = client[
+                "next_installment_payment_date"
+            ]
+
+            client_installments_left_to_pay = "\n".join(client_installments_left_to_pay)
+
+            self.table.insert(
+                "",
+                "end",
+                values=(
+                    client_name,
+                    client_debt,
+                    total_client_installments,
+                    paid_client_installments,
+                    client_installments_left_to_pay,
+                    next_client_installment_payment_date,
+                ),
+            )
