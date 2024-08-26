@@ -7,6 +7,7 @@ from items_scrollable_frame import ItemsScrollableFrame
 import random
 import string
 import globals
+from clients_spreadsheet_window import ClientsSpreadsheetWindow
 
 
 class App(ctk.CTk):
@@ -45,8 +46,17 @@ class App(ctk.CTk):
             command=lambda: InsertItemWindow(self.refresh_items),
         )
 
+        self.open_clients_spreadsheet_window_button = ctk.CTkButton(
+            self,
+            text="Abrir planilha de clientes",
+            command=lambda: ClientsSpreadsheetWindow(),
+        )
+
     def display_widgets(self):
         self.add_new_item_button.place(relx=0.98, rely=0.01, anchor="ne")
+        self.open_clients_spreadsheet_window_button.place(
+            relx=0.83, rely=0.01, anchor="ne"
+        )
 
     def on_close_callback(self):
         try:
@@ -77,9 +87,15 @@ class App(ctk.CTk):
                 text="Adicionar item",
                 command=lambda: InsertItemWindow(self.refresh_items),
             )
+            self.open_clients_spreadsheet_window_button = ctk.CTkButton(
+                self,
+                text="Abrir planilha de clientes",
+                command=lambda: ClientsSpreadsheetWindow(),
+            )
 
             self.no_items_warn_label.pack(pady=20)
             self.add_items_button.pack()
+            self.open_clients_spreadsheet_window_button.pack(pady=20)
 
         else:
             # creating the "add new item" button
