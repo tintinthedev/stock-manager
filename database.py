@@ -3,7 +3,6 @@ from pymongo.collection import Collection
 from bson.objectid import ObjectId
 import bson.binary
 from typing import TypedDict
-import datetime
 
 
 class Item(TypedDict):
@@ -19,6 +18,7 @@ class Client(TypedDict):
     individual_installment_value: float
     next_installment_payment_date: float
     installments_left_to_pay: int
+    paid_installments_date: list[str]
 
 
 class Database:
@@ -39,7 +39,7 @@ class Database:
         debt: float,
         total_installments: int,
         individual_installment_value: float,
-        next_installment_payment_date: datetime.date,
+        next_installment_payment_date: str,
     ):
 
         self.clients_database.insert_one(
@@ -49,7 +49,7 @@ class Database:
                 "total_installments": total_installments,
                 "individual_installment_value": individual_installment_value,
                 "next_installment_payment_date": next_installment_payment_date,
-                "paid_installments": 0,
+                "paid_installments_date": [],
                 "installments_left_to_pay": total_installments,
             }
         )
