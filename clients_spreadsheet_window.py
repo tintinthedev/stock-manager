@@ -2,13 +2,13 @@ import customtkinter as ctk
 from tkinter import ttk
 from add_client_to_spreadsheet_window import AddClientToSpreadsheetWindow
 from database import Database
+from CTkTable import *
 
 
 class ClientsSpreadsheetWindow(ctk.CTkToplevel):
     def __init__(self):
         super().__init__()
-        style = ttk.Style(self)
-        style.configure("Treeview", rowheight=200)
+
         self.title("Planilha de clientes")
 
         self.attributes("-topmost", True)
@@ -30,42 +30,26 @@ class ClientsSpreadsheetWindow(ctk.CTkToplevel):
 
         self.add_client_button.pack(pady=10, padx=20)
 
-        # Table Frame
-        self.table_frame = ctk.CTkFrame(self)
-        self.table_frame.pack(pady=20, fill="both", expand=True)
-
+        self.table_frame = ctk.CTkScrollableFrame(self)
+        self.table_frame.pack(expand=True, fill="both")
         self.create_table()
 
-        self.refresh_table()
-
     def create_table(self):
-        self.table = ttk.Treeview(
-            self.table_frame,
-            columns=(
-                "Nome",
-                "Dívida",
-                "Parcelas totais",
-                "Parcelas efetivadas",
-                "Parcelas em aberto",
-                "Data da próxima parcela",
-            ),
-            show="headings",
-        )
-        self.table.pack(fill="both", expand=True)
+        table_rows = (
+            Database().count_clients() + 1
+        )  # adding one because of the table head
 
-        for col in self.table["columns"]:
-            self.table.heading(col, text=col)
-            self.table.column(col, width=150)
-
-    def add_client(self):
-        client_creation_window = AddClientToSpreadsheetWindow()
-        self.wait_window(client_creation_window)
-
-        self.refresh_table()
-
-    def refresh_table(self):
-        # clearing the table before getting data
-        self.table.delete(*self.table.get_children())
+        # these first values are the table head
+        table_values = [
+            [
+                "NOME",
+                "DÍVIDA",
+                "PARCELAS TOTAIS",
+                "PARCELAS EFETIVADAS",
+                "PARCELAS EM ABERTO",
+                "PRÓXIMA PARCELA",
+            ],
+        ]
 
         clients = Database().get_clients()
 
@@ -79,17 +63,32 @@ class ClientsSpreadsheetWindow(ctk.CTkToplevel):
                 "next_installment_payment_date"
             ]
 
+            paid_client_installments = "\n".join(paid_client_installments)
             client_installments_left_to_pay = "\n".join(client_installments_left_to_pay)
 
-            self.table.insert(
-                "",
-                "end",
-                values=(
-                    client_name,
-                    client_debt,
-                    total_client_installments,
-                    paid_client_installments,
-                    client_installments_left_to_pay,
-                    next_client_installment_payment_date,
-                ),
-            )
+            client_table_row = [
+                client_name,
+                client_debt,
+                total_client_installments,
+                paid_client_installments,
+                client_installments_left_to_pay,
+                next_client_installment_payment_date,
+            ]
+
+            table_values.append(client_table_row)
+
+        # clearing possible old data from table by deleting the table
+        for widget in self.table_frame.winfo_children():
+            widget.destroy()
+
+        self.table = CTkTable(
+            self.table_frame, column=6, row=table_rows, values=table_values
+        )
+
+        self.table.pack(expand=True, fill="both")
+
+    def add_client(self):
+        client_creation_window = AddClientToSpreadsheetWindow()
+        self.wait_window(client_creation_window)  # waiting for the window to close
+
+        self.create_table()
