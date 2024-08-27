@@ -86,6 +86,9 @@ class Database:
     def get_clients(self):
         return self.clients_database.find()
 
+    def count_clients(self):
+        return self.clients_database.count_documents({})
+
     def create_item(self, name: str, quantity: int, image_path: str):
         with open(image_path, "rb") as item_image_file:
             encoded_item_image = bson.binary.Binary(item_image_file.read())
