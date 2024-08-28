@@ -27,7 +27,9 @@ class EditClientDataWindow(ctk.CTkToplevel):
 
     def create_widgets(self):
         self.client_name_entry_placehodler = ctk.CTkLabel(self, text="Nome do cliente")
-        self.client_name_entry = ctk.CTkEntry(self, textvariable=self.client_name)
+        self.client_name_entry = ctk.CTkEntry(
+            self, textvariable=self.client_name, width=250
+        )
 
         self.client_debt_entry_placeholder = ctk.CTkLabel(
             self, text="Dívida do cliente"
