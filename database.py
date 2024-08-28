@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 import bson.binary
 from typing import TypedDict
 import datetime
+import re
 
 
 class Item(TypedDict):
@@ -120,6 +121,15 @@ class Database:
 
     def delete_client(self, client_id):
         self.clients_database.delete_one({"_id": client_id})
+
+    def get_client_by_name(self, client_name):
+        escaped_client_name = re.escape(client_name)
+
+        client_name_pattern = re.compile(escaped_client_name, re.IGNORECASE)
+
+        found_clients = self.clients_database.find({"name": client_name_pattern})
+
+        return found_clients
 
     def create_item(self, name: str, quantity: int, image_path: str):
         with open(image_path, "rb") as item_image_file:
