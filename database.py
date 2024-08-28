@@ -89,6 +89,38 @@ class Database:
     def count_clients(self):
         return self.clients_database.count_documents({})
 
+    def edit_client(self, client_data):
+        client_id = client_data["client_id"]
+        client_name = client_data["name"]
+        client_debt = client_data["debt"]
+        client_individual_installment_value = client_data[
+            "individual_installment_value"
+        ]
+        client_total_installments = client_data["total_installments"]
+        client_next_installment_payment_date = client_data[
+            "next_installment_payment_date"
+        ]
+        client_installments_left_to_pay = client_data["installments_left_to_pay_dates"]
+        client_paid_installments = client_data["paid_installments_date"]
+
+        self.clients_database.update_one(
+            {"_id": client_id},
+            {
+                "$set": {
+                    "name": client_name,
+                    "debt": client_debt,
+                    "total_installments": client_total_installments,
+                    "individual_installment_value": client_individual_installment_value,
+                    "next_installment_payment_date": client_next_installment_payment_date,
+                    "paid_installments_date": client_paid_installments,
+                    "installments_left_to_pay_dates": client_installments_left_to_pay,
+                }
+            },
+        )
+
+    def delete_client(self, client_id):
+        self.clients_database.delete_one({"_id": client_id})
+
     def create_item(self, name: str, quantity: int, image_path: str):
         with open(image_path, "rb") as item_image_file:
             encoded_item_image = bson.binary.Binary(item_image_file.read())
