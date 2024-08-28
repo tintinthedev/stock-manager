@@ -46,6 +46,39 @@ class ClientsSpreadsheetWindow(ctk.CTkToplevel):
         self.table_frame.pack(expand=True, fill="both")
         self.create_table()
 
+    def format_clients_data_row_to_table(self, clients):
+        formatted_client_rows = []
+
+        for client in clients:
+            client_name = client["name"]
+            client_debt = client["debt"]
+            individual_installment_value = client["individual_installment_value"]
+            total_client_installments = client["total_installments"]
+            paid_client_installments = client["paid_installments_date"]
+            client_installments_left_to_pay = client["installments_left_to_pay_dates"]
+            next_client_installment_payment_date = client[
+                "next_installment_payment_date"
+            ]
+            client_id = client["_id"]
+
+            paid_client_installments = "\n".join(paid_client_installments)
+            client_installments_left_to_pay = "\n".join(client_installments_left_to_pay)
+
+            client_table_row = [
+                client_name,
+                client_debt,
+                individual_installment_value,
+                total_client_installments,
+                paid_client_installments,
+                client_installments_left_to_pay,
+                next_client_installment_payment_date,
+                client_id,
+            ]
+
+            formatted_client_rows.append(client_table_row)
+
+        return formatted_client_rows
+
     def create_table(self, clients=None):
         table_rows = (
             Database().count_clients() + 1 if clients is None else len(clients) + 1
@@ -68,72 +101,17 @@ class ClientsSpreadsheetWindow(ctk.CTkToplevel):
         # if there are clients passed as a parameter, only show their data
         # otherwise, show data of every client
         if clients is not None:
-            for client in clients:
-                client_name = client["name"]
-                client_debt = client["debt"]
-                individual_installment_value = client["individual_installment_value"]
-                total_client_installments = client["total_installments"]
-                paid_client_installments = client["paid_installments_date"]
-                client_installments_left_to_pay = client[
-                    "installments_left_to_pay_dates"
-                ]
-                next_client_installment_payment_date = client[
-                    "next_installment_payment_date"
-                ]
-                client_id = client["_id"]
+            formatted_table_rows = self.format_clients_data_row_to_table(clients)
 
-                paid_client_installments = "\n".join(paid_client_installments)
-                client_installments_left_to_pay = "\n".join(
-                    client_installments_left_to_pay
-                )
-
-                client_table_row = [
-                    client_name,
-                    client_debt,
-                    individual_installment_value,
-                    total_client_installments,
-                    paid_client_installments,
-                    client_installments_left_to_pay,
-                    next_client_installment_payment_date,
-                    client_id,
-                ]
-
-                table_values.append(client_table_row)
-
+            for table_row in formatted_table_rows:
+                table_values.append(table_row)
         else:
             clients = Database().get_clients()
 
-            for client in clients:
-                client_name = client["name"]
-                client_debt = client["debt"]
-                individual_installment_value = client["individual_installment_value"]
-                total_client_installments = client["total_installments"]
-                paid_client_installments = client["paid_installments_date"]
-                client_installments_left_to_pay = client[
-                    "installments_left_to_pay_dates"
-                ]
-                next_client_installment_payment_date = client[
-                    "next_installment_payment_date"
-                ]
-                client_id = client["_id"]
+            formatted_table_rows = self.format_clients_data_row_to_table(clients)
 
-                paid_client_installments = "\n".join(paid_client_installments)
-                client_installments_left_to_pay = "\n".join(
-                    client_installments_left_to_pay
-                )
-
-                client_table_row = [
-                    client_name,
-                    client_debt,
-                    individual_installment_value,
-                    total_client_installments,
-                    paid_client_installments,
-                    client_installments_left_to_pay,
-                    next_client_installment_payment_date,
-                    client_id,
-                ]
-
-                table_values.append(client_table_row)
+            for table_row in formatted_table_rows:
+                table_values.append(table_row)
 
         # clearing possible old data from table by deleting the table
         for widget in self.table_frame.winfo_children():
