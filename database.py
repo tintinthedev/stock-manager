@@ -25,6 +25,7 @@ class Client(TypedDict):
 
 class Database:
     def __init__(self):
+        # the password changed, this connection url shouldn't work
         self.client = MongoClient(
             "mongodb+srv://randomthecoder1557:PHWXHGBz3822bh6u@tintin-cluster.cm5rl.mongodb.net/?retryWrites=true&w=majority&appName=tintin-cluster"
         )
